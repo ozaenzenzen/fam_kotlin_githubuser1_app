@@ -1,3 +1,25 @@
 <resources>
     <string name="app_name">FAMGithubUser1</string>
+    <string name="user_name">User Name</string>
+    <string name="name">Name</string>
+    <string name="company">Company</string>
+    <string name="github_logo">GitHub Logo</string>
+    <string name="_24">24</string>
+    <string name="repositories">Repositories</string>
+    <string name="following">Following</string>
+    <string name="followers">Followers</string>
+    <string name="location">Location</string>
+    <string name="open_on_github">Open on GitHub</string>
+    <string name="profile">Profile</string>
+    <string name="search">Search</string>
+    <string name="github_username">GitHub Username</string>
+    <string name="showing_results">Showing %d results</string>
+    <string name="bio_dummy">This is my bio</string>
+    <string name="site_dummy">mysite.com</string>
+    <string name="no_users_found">No users found.</string>
+    <string name="user_profile_picture">User Profile Picture</string>
+    <string name="setting">Setting</string>
+    <string name="favorite">Favorite</string>
+    <string name="theme">Theme</string>
+    <string name="dark_mode">Dark Mode</string>
 </resources>
