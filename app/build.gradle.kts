@@ -24,12 +24,7 @@ android {
         var localProperties = Properties()
         localProperties.load(FileInputStream(rootProject.file("local.properties")))
 
-//        buildConfigField("String", "API_KEY", "\"" + localProperties["apiKey"] + "\"")
-        buildConfigField(
-            "String",
-            "API_KEY",
-            "\"" + "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" + "\""
-        )
+        buildConfigField("String", "API_KEY", "\"" + localProperties["apiKey"] + "\"")
     }
 
     buildTypes {
