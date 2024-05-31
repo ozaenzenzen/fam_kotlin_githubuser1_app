@@ -11,10 +11,10 @@ import com.google.gson.annotations.SerializedName
 	val incompleteResults: Boolean,
 
 	@field:SerializedName("items")
-	val items: List<ItemsItem>
+	val items: List<UserModel>
 )
 
- class ItemsItem(
+ class UserModel(
 
 	@field:SerializedName("gists_url")
 	val gistsUrl: String,
