@@ -1,6 +1,11 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("kotlin-parcelize")
+    "java-library"
 }
 
 android {
@@ -15,6 +20,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        var localProperties = Properties()
+        localProperties.load(FileInputStream(rootProject.file("local.properties")))
+
+        buildConfigField("String", "API_KEY", "\"" + localProperties["apiKey"] + "\"")
     }
 
     buildTypes {
@@ -36,6 +46,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 
