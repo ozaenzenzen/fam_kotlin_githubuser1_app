@@ -23,20 +23,20 @@ interface ApiService {
     ): Call<SearchUserResponseModel>
 
     @GET("users/{username}")
-    suspend fun getUserDetail(
+    fun getUserDetail(
         @Header("Authorization") token: String,
         @Path("username") username: String
-    ): DetailUserResponseModel
+    ): Call<DetailUserResponseModel>
 
     @GET("users/{username}/followers")
-    suspend fun getUserFollowers(
+    fun getUserFollowers(
         @Header("Authorization") token: String,
         @Path("username") username: String
-    ): ArrayList<ListFollowersResponseModel>
+    ): Call<ArrayList<ListFollowersResponseModel>>
 
     @GET("users/{username}/following")
-    suspend fun getUserFollowing(
+    fun getUserFollowing(
         @Header("Authorization") token: String,
         @Path("username") username: String
-    ): ArrayList<ListFollowingResponseModel>
+    ): Call<ArrayList<ListFollowingResponseModel>>
 }
