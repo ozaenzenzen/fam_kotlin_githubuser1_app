@@ -1,6 +1,7 @@
 package com.example.famgithubuser1.ui.view
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -21,6 +22,7 @@ import com.example.famgithubuser1.data.response.UserModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
 import com.example.famgithubuser1.databinding.ActivityMainBinding
 import com.example.famgithubuser1.ui.adapter.ListUserAdapter
+import com.example.famgithubuser1.ui.view.DetailUserActivity.Companion.EXTRA_DETAIL
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -108,6 +110,11 @@ class MainActivity : AppCompatActivity() {
             adapter = listUserAdapter
             setHasFixedSize(true)
         }
+        listUserAdapter.setOnItemClickCallback(object : ListUserAdapter.OnItemClickCallback {
+            override fun onItemClicked(user: UserModel) {
+                goToDetailUser(user)
+            }
+        })
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -122,5 +129,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun errorAction() {
         Toast.makeText(this@MainActivity, "An Error is Occurred", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun goToDetailUser(user: UserModel) {
+        Intent(this@MainActivity, DetailUserActivity::class.java).apply {
+            putExtra(EXTRA_DETAIL, user.login)
+        }.also {
+            startActivity(it)
+        }
     }
 }

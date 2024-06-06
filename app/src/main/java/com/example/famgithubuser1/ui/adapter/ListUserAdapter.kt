@@ -19,6 +19,12 @@ class ListUserAdapter : ListAdapter<UserModel, ListUserAdapter.MyViewHolder>(DIF
 //        }
     }
 
+    private lateinit var onItemClickCallback: OnItemClickCallback
+
+    fun setOnItemClickCallback(onItemClickCallback: OnItemClickCallback) {
+        this.onItemClickCallback = onItemClickCallback
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -39,6 +45,8 @@ class ListUserAdapter : ListAdapter<UserModel, ListUserAdapter.MyViewHolder>(DIF
                 .placeholder(R.drawable.profile_placeholder)
                 .into(holder.binding.cardImageProfile);
         }
+
+        holder.itemView.setOnClickListener { onItemClickCallback.onItemClicked(itemUser) }
     }
 
     companion object {
@@ -51,5 +59,9 @@ class ListUserAdapter : ListAdapter<UserModel, ListUserAdapter.MyViewHolder>(DIF
                 return oldItem == newItem
             }
         }
+    }
+
+    interface OnItemClickCallback {
+        fun onItemClicked(user: UserModel)
     }
 }
