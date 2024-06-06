@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.bumptech.glide.Glide
 import com.example.famgithubuser1.BuildConfig
 import com.example.famgithubuser1.R
 import com.example.famgithubuser1.data.response.DetailUserResponseModel
@@ -33,24 +34,37 @@ class DetailUserActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailUserBinding
 
-    private var userName: String? = null
+    private var usernameProfile: String? = null
     private var profileUrl: String? = null
-    private var userDetail: UserModel? = null
+    private var userDetail: DetailUserResponseModel? = null
     private var isFavorite: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityDetailUserBinding.inflate(layoutInflater)
+        usernameProfile = intent.extras?.get(EXTRA_DETAIL) as String
         setContentView(binding.root)
 
         setToolbar(getString(R.string.profile))
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                //
+                launch {
+//                    if (binding.progressBar.visibility == View.VISIBLE) detailUserGithub(
+//                        usernameProfile ?: ""
+//                    )
+                    detailUserGithub(
+                        usernameProfile ?: ""
+                    )
+                }
             }
         }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 
     private fun detailUserGithub(userName: String) {
@@ -65,7 +79,7 @@ class DetailUserActivity : AppCompatActivity() {
                 showLoading(false)
                 val responseBody = response.body()
                 if (response.isSuccessful && responseBody != null) {
-//                    setRecycleViewData(responseBody.items)
+                    setDetailUserData(responseBody)
                 } else {
                     Log.e(TAG, "onFailure ${response.message()}")
                 }
@@ -76,6 +90,22 @@ class DetailUserActivity : AppCompatActivity() {
                 Log.e(TAG, "onFailure ${t.message}")
             }
         })
+    }
+
+    fun setDetailUserData(detailUserResponseModel: DetailUserResponseModel) {
+        userDetail = detailUserResponseModel
+        binding.apply {
+            tvName.text = userDetail?.name.toString()
+            tvUsername.text = userDetail?.login.toString()
+            tvRepositories.text = userDetail?.publicRepos.toString()
+            tvFollowing.text = userDetail?.following.toString()
+            tvFollowers.text = userDetail?.followers.toString()
+        }
+//        Glide
+//            .with(context)
+//            .load(userDetail?.avatarUrl.toString())
+//            .placeholder(R.drawable.profile_placeholder)
+//            .into(binding.userImageDetail);
     }
 
     private fun showLoading(isLoading: Boolean) {
@@ -98,5 +128,11 @@ class DetailUserActivity : AppCompatActivity() {
         }
     }
 
-
+    override fun onDestroy() {
+//        binding = null
+        usernameProfile = null
+        profileUrl = null
+        isFavorite = null
+        super.onDestroy()
+    }
 }
