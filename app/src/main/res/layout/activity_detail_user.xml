@@ -45,7 +45,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"
                 android:gravity="center"
-                android:visibility="gone"
                 tools:text="@string/name" />
 
             <TextView

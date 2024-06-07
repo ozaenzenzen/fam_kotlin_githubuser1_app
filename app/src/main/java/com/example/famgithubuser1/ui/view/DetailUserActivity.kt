@@ -95,17 +95,17 @@ class DetailUserActivity : AppCompatActivity() {
     fun setDetailUserData(detailUserResponseModel: DetailUserResponseModel) {
         userDetail = detailUserResponseModel
         binding.apply {
-            tvName.text = userDetail?.name.toString()
+            tvName.text = if (userDetail?.name == null) "" else userDetail?.name.toString()
             tvUsername.text = userDetail?.login.toString()
             tvRepositories.text = userDetail?.publicRepos.toString()
             tvFollowing.text = userDetail?.following.toString()
             tvFollowers.text = userDetail?.followers.toString()
         }
-//        Glide
-//            .with(context)
-//            .load(userDetail?.avatarUrl.toString())
-//            .placeholder(R.drawable.profile_placeholder)
-//            .into(binding.userImageDetail);
+        Glide
+            .with(this)
+            .load(userDetail?.avatarUrl.toString())
+            .placeholder(R.drawable.profile_placeholder)
+            .into(binding.userImageDetail);
     }
 
     private fun showLoading(isLoading: Boolean) {
