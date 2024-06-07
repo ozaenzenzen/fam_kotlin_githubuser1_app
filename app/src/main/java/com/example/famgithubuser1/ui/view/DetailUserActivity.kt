@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.famgithubuser1.BuildConfig
 import com.example.famgithubuser1.R
@@ -17,6 +18,9 @@ import com.example.famgithubuser1.data.response.UserModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
 import com.example.famgithubuser1.databinding.ActivityDetailUserBinding
 import com.example.famgithubuser1.databinding.ActivityMainBinding
+import com.example.famgithubuser1.ui.adapter.TabListFollAdapter
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -46,6 +50,7 @@ class DetailUserActivity : AppCompatActivity() {
         usernameProfile = intent.extras?.get(EXTRA_DETAIL) as String
         setContentView(binding.root)
 
+        setViewPager()
         setToolbar(getString(R.string.profile))
 
         lifecycleScope.launch {
@@ -65,6 +70,17 @@ class DetailUserActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         onBackPressed()
         return true
+    }
+
+    private fun setViewPager() {
+        val viewPager: ViewPager2 = binding.viewPager
+        val tabs: TabLayout = binding.tabs
+
+        viewPager.adapter = TabListFollAdapter(this, usernameProfile!!)
+
+        TabLayoutMediator(tabs, viewPager) { tab, position ->
+            tab.text = resources.getString(TAB_TITLES[position])
+        }.attach()
     }
 
     private fun detailUserGithub(userName: String) {

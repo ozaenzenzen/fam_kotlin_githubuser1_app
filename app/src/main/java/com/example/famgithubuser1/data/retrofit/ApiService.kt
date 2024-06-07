@@ -5,6 +5,7 @@ import com.example.famgithubuser1.data.response.DetailUserResponseModel
 import com.example.famgithubuser1.data.response.ListFollowersResponseModel
 import com.example.famgithubuser1.data.response.ListFollowingResponseModel
 import com.example.famgithubuser1.data.response.SearchUserResponseModel
+import com.example.famgithubuser1.data.response.UserModel
 import retrofit2.Call
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
@@ -32,11 +33,11 @@ interface ApiService {
     fun getUserFollowers(
         @Header("Authorization") token: String,
         @Path("username") username: String
-    ): Call<ArrayList<ListFollowersResponseModel>>
+    ): Call<List<UserModel>>
 
     @GET("users/{username}/following")
     fun getUserFollowing(
         @Header("Authorization") token: String,
         @Path("username") username: String
-    ): Call<ArrayList<ListFollowingResponseModel>>
+    ): Call<List<UserModel>>
 }
