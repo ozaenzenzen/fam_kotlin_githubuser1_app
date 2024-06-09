@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainViewModel.isLoading.observe(this) {
-            value -> showLoading(value)
+                value -> showLoading(value)
         }
 
         lifecycleScope.launch {
@@ -92,7 +92,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun setRecycleViewData(listUserModelData: List<UserModel>) {
+    private fun setRecycleViewData(listUserModelData: ArrayList<UserModel>) {
         val listUserAdapter = ListUserAdapter()
         listUserAdapter.submitList(listUserModelData)
         binding.home.recyclerView.apply {
