@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.famgithubuser1.BuildConfig
@@ -14,6 +16,8 @@ import com.example.famgithubuser1.data.response.UserModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
 import com.example.famgithubuser1.databinding.FragmentFollowersBinding
 import com.example.famgithubuser1.ui.adapter.ListUserAdapter
+import com.example.famgithubuser1.ui.viewmodel.FollowersViewModel
+import com.example.famgithubuser1.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -31,6 +35,8 @@ private const val ARG_PARAM2 = "param2"
  */
 class FollowersFragment : Fragment() {
     private lateinit var binding: FragmentFollowersBinding
+
+    private val followersViewModel: FollowersViewModel by viewModels()
 
     companion object {
         const val ARGS_USERNAME = "username"
@@ -50,49 +56,35 @@ class FollowersFragment : Fragment() {
         val username = arguments?.getString(ARGS_USERNAME) ?: ""
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             launch {
-                followersUserGithub(username ?: "")
-            }
-        }
-    }
-
-    private fun followersUserGithub(userName: String) {
-        showLoading(true)
-        val client =
-            ApiConfig.getApiService().getUserFollowers("Bearer ${BuildConfig.API_KEY}", userName)
-        client.enqueue(object : Callback<ArrayList<UserModel>> {
-            override fun onResponse(
-                call: Call<ArrayList<UserModel>>,
-                response: Response<ArrayList<UserModel>>
-            ) {
-                showLoading(false)
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    setRecycleViewFollowers(responseBody)
-                } else {
-                    Log.e(TAG, "onFailure ${response.message()}")
+                followersViewModel.listFollowers.observe(viewLifecycleOwner) {
+                    setRecycleViewFollowers(it)
+                }
+                followersViewModel.isLoading.observe(viewLifecycleOwner) { value ->
+                    showLoading(value)
                 }
             }
+            launch {
 
-            override fun onFailure(call: Call<ArrayList<UserModel>>, t: Throwable) {
-                showLoading(false)
-                Log.e(TAG, "onFailure ${t.message}")
+                followersViewModel.followersUserGithub(username ?: "")
             }
-        })
+        }
     }
 
-    fun setRecycleViewFollowers(listFollowersResponseModel: List<UserModel>) {
-        val listUserAdapter = ListUserAdapter()
-        listUserAdapter.submitList(listFollowersResponseModel)
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = listUserAdapter
-            setHasFixedSize(true)
-        }
-        listUserAdapter.setOnItemClickCallback(object : ListUserAdapter.OnItemClickCallback {
-            override fun onItemClicked(user: UserModel) {
-                goToDetailUser(user)
+    fun setRecycleViewFollowers(listFollowersResponseModel: ArrayList<UserModel>) {
+        if (listFollowersResponseModel.size > 0) {
+            val listUserAdapter = ListUserAdapter()
+            listUserAdapter.submitList(listFollowersResponseModel)
+            binding.recyclerView.apply {
+                layoutManager = LinearLayoutManager(activity)
+                adapter = listUserAdapter
+                setHasFixedSize(true)
             }
-        })
+            listUserAdapter.setOnItemClickCallback(object : ListUserAdapter.OnItemClickCallback {
+                override fun onItemClicked(user: UserModel) {
+                    goToDetailUser(user)
+                }
+            })
+        }
     }
 
     private fun goToDetailUser(user: UserModel) {

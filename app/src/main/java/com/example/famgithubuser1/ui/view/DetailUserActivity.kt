@@ -40,7 +40,7 @@ class DetailUserActivity : AppCompatActivity() {
     private var usernameProfile: String? = null
     private var profileUrl: String? = null
     private var userDetail: DetailUserResponseModel? = null
-    private var isFavorite: Boolean? = null
+//    private var isFavorite: Boolean? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +59,10 @@ class DetailUserActivity : AppCompatActivity() {
 
         detailUserViewModel.detailUser.observe(this) {
             setDetailUserData(it)
+        }
+
+        detailUserViewModel.isLoading.observe(this) {
+                value -> showLoading(value)
         }
 
         lifecycleScope.launch {
@@ -132,7 +136,7 @@ class DetailUserActivity : AppCompatActivity() {
 //        binding = null
         usernameProfile = null
         profileUrl = null
-        isFavorite = null
+//        isFavorite = null
         super.onDestroy()
     }
 }

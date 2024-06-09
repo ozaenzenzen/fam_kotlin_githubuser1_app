@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.famgithubuser1.BuildConfig
@@ -16,6 +17,8 @@ import com.example.famgithubuser1.data.retrofit.ApiConfig
 import com.example.famgithubuser1.databinding.FragmentFollowersBinding
 import com.example.famgithubuser1.databinding.FragmentFollowingBinding
 import com.example.famgithubuser1.ui.adapter.ListUserAdapter
+import com.example.famgithubuser1.ui.viewmodel.DetailUserViewModel
+import com.example.famgithubuser1.ui.viewmodel.FollowingViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -39,11 +42,17 @@ class FollowingFragment : Fragment() {
         private const val TAG = "FollowingFragment"
     }
 
+    private lateinit var followingViewModel: FollowingViewModel
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentFollowingBinding.inflate(layoutInflater)
+        followingViewModel = ViewModelProvider(
+            requireActivity()
+        ).get(FollowingViewModel::class.java)
         return binding.root
     }
 
@@ -52,49 +61,35 @@ class FollowingFragment : Fragment() {
         val username = arguments?.getString(ARGS_USERNAME) ?: ""
         viewLifecycleOwner.lifecycleScope.launchWhenStarted {
             launch {
-                followingUserGithub(username ?: "")
-            }
-        }
-    }
-
-    private fun followingUserGithub(userName: String) {
-        showLoading(true)
-        val client =
-            ApiConfig.getApiService().getUserFollowing("Bearer ${BuildConfig.API_KEY}", userName)
-        client.enqueue(object : Callback<ArrayList<UserModel>> {
-            override fun onResponse(
-                call: Call<ArrayList<UserModel>>,
-                response: Response<ArrayList<UserModel>>
-            ) {
-                showLoading(false)
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    setRecycleViewFollowers(responseBody)
-                } else {
-                    Log.e(TAG, "onFailure ${response.message()}")
+                followingViewModel.listFollowing.observe(viewLifecycleOwner) {
+                    setRecycleViewFollowing(it)
+                }
+                followingViewModel.isLoading.observe(viewLifecycleOwner) { value ->
+                    showLoading(value)
                 }
             }
-
-            override fun onFailure(call: Call<ArrayList<UserModel>>, t: Throwable) {
-                showLoading(false)
-                Log.e(TAG, "onFailure ${t.message}")
+            launch {
+                followingViewModel.followingUserGithub(username ?: "")
             }
-        })
+        }
     }
 
-    fun setRecycleViewFollowers(listFollowingResponseModel: List<UserModel>) {
-        val listUserAdapter = ListUserAdapter()
-        listUserAdapter.submitList(listFollowingResponseModel)
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = listUserAdapter
-            setHasFixedSize(true)
-        }
-        listUserAdapter.setOnItemClickCallback(object : ListUserAdapter.OnItemClickCallback {
-            override fun onItemClicked(user: UserModel) {
-                goToDetailUser(user)
+
+    fun setRecycleViewFollowing(listFollowingResponseModel: ArrayList<UserModel>) {
+        if (listFollowingResponseModel.size > 0) {
+            val listUserAdapter = ListUserAdapter()
+            listUserAdapter.submitList(listFollowingResponseModel)
+            binding.recyclerView.apply {
+                layoutManager = LinearLayoutManager(activity)
+                adapter = listUserAdapter
+                setHasFixedSize(true)
             }
-        })
+            listUserAdapter.setOnItemClickCallback(object : ListUserAdapter.OnItemClickCallback {
+                override fun onItemClicked(user: UserModel) {
+                    goToDetailUser(user)
+                }
+            })
+        }
     }
 
     private fun goToDetailUser(user: UserModel) {
@@ -114,4 +109,6 @@ class FollowingFragment : Fragment() {
 //            binding.home.recyclerView.visibility = View.VISIBLE
         }
     }
+
+
 }
