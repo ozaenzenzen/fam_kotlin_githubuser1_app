@@ -74,8 +74,12 @@ class FollowersFragment : Fragment() {
         if (listFollowersResponseModel.size > 0) {
             val listUserAdapter = ListUserAdapter()
             listUserAdapter.submitList(listFollowersResponseModel)
+
+//            val linearLayoutManager = LinearLayoutManager(activity)
+//            val listUserAdapter = ListUserAdapter(listFollowersResponseModel)
             binding.recyclerView.apply {
                 layoutManager = LinearLayoutManager(activity)
+//                layoutManager = linearLayoutManager
                 adapter = listUserAdapter
                 setHasFixedSize(true)
             }
@@ -84,6 +88,8 @@ class FollowersFragment : Fragment() {
                     goToDetailUser(user)
                 }
             })
+        } else {
+            binding.tvStatus.visibility = View.VISIBLE
         }
     }
 
