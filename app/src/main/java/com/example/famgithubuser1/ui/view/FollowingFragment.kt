@@ -60,11 +60,11 @@ class FollowingFragment : Fragment() {
     private fun followingUserGithub(userName: String) {
         showLoading(true)
         val client =
-            ApiConfig.getApiService().getUserFollowers("Bearer ${BuildConfig.API_KEY}", userName)
-        client.enqueue(object : Callback<List<UserModel>> {
+            ApiConfig.getApiService().getUserFollowing("Bearer ${BuildConfig.API_KEY}", userName)
+        client.enqueue(object : Callback<ArrayList<UserModel>> {
             override fun onResponse(
-                call: Call<List<UserModel>>,
-                response: Response<List<UserModel>>
+                call: Call<ArrayList<UserModel>>,
+                response: Response<ArrayList<UserModel>>
             ) {
                 showLoading(false)
                 val responseBody = response.body()
@@ -75,7 +75,7 @@ class FollowingFragment : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<List<UserModel>>, t: Throwable) {
+            override fun onFailure(call: Call<ArrayList<UserModel>>, t: Throwable) {
                 showLoading(false)
                 Log.e(TAG, "onFailure ${t.message}")
             }

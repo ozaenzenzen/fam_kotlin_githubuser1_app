@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName
 	val incompleteResults: Boolean,
 
 	@field:SerializedName("items")
-	val items: List<UserModel>
+	val items: ArrayList<UserModel>
 )
 
  class UserModel(

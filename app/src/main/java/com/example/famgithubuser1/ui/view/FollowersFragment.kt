@@ -9,18 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bumptech.glide.Glide
 import com.example.famgithubuser1.BuildConfig
-import com.example.famgithubuser1.R
-import com.example.famgithubuser1.data.response.DetailUserResponseModel
-import com.example.famgithubuser1.data.response.ListFollowersResponseModel
-import com.example.famgithubuser1.data.response.ListFollowersResponseModelItem
 import com.example.famgithubuser1.data.response.UserModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
-import com.example.famgithubuser1.databinding.ActivityDetailUserBinding
 import com.example.famgithubuser1.databinding.FragmentFollowersBinding
 import com.example.famgithubuser1.ui.adapter.ListUserAdapter
-import com.example.famgithubuser1.ui.adapter.TabListFollAdapter
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -66,10 +59,10 @@ class FollowersFragment : Fragment() {
         showLoading(true)
         val client =
             ApiConfig.getApiService().getUserFollowers("Bearer ${BuildConfig.API_KEY}", userName)
-        client.enqueue(object : Callback<List<UserModel>> {
+        client.enqueue(object : Callback<ArrayList<UserModel>> {
             override fun onResponse(
-                call: Call<List<UserModel>>,
-                response: Response<List<UserModel>>
+                call: Call<ArrayList<UserModel>>,
+                response: Response<ArrayList<UserModel>>
             ) {
                 showLoading(false)
                 val responseBody = response.body()
@@ -80,7 +73,7 @@ class FollowersFragment : Fragment() {
                 }
             }
 
-            override fun onFailure(call: Call<List<UserModel>>, t: Throwable) {
+            override fun onFailure(call: Call<ArrayList<UserModel>>, t: Throwable) {
                 showLoading(false)
                 Log.e(TAG, "onFailure ${t.message}")
             }

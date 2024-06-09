@@ -33,11 +33,11 @@ interface ApiService {
     fun getUserFollowers(
         @Header("Authorization") token: String,
         @Path("username") username: String
-    ): Call<List<UserModel>>
+    ): Call<ArrayList<UserModel>>
 
     @GET("users/{username}/following")
     fun getUserFollowing(
         @Header("Authorization") token: String,
         @Path("username") username: String
-    ): Call<List<UserModel>>
+    ): Call<ArrayList<UserModel>>
 }

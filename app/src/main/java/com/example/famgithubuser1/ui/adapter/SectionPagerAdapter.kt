@@ -7,7 +7,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.famgithubuser1.ui.view.FollowersFragment
 import com.example.famgithubuser1.ui.view.FollowingFragment
 
-class TabListFollAdapter(activity: AppCompatActivity, private val username: String) :
+class SectionPagerAdapter(activity: AppCompatActivity, private val username: String) :
     FragmentStateAdapter(activity) {
 
     companion object {

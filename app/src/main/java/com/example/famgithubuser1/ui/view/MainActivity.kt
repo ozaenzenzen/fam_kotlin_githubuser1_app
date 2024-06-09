@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,6 +24,7 @@ import com.example.famgithubuser1.data.retrofit.ApiConfig
 import com.example.famgithubuser1.databinding.ActivityMainBinding
 import com.example.famgithubuser1.ui.adapter.ListUserAdapter
 import com.example.famgithubuser1.ui.view.DetailUserActivity.Companion.EXTRA_DETAIL
+import com.example.famgithubuser1.ui.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
@@ -43,10 +45,22 @@ class MainActivity : AppCompatActivity() {
         // Set up the toolbar
         setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
 
+        val mainViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.NewInstanceFactory()
+        ).get(MainViewModel::class.java)
+        mainViewModel.listUser.observe(this) { data ->
+            setRecycleViewData(data)
+        }
+
         // Ensure SearchView is expanded by default
         val searchView = findViewById<SearchView>(R.id.search_view)
         if (searchView != null) {
             searchView.setIconifiedByDefault(false)
+        }
+
+        mainViewModel.isLoading.observe(this) {
+            value -> showLoading(value)
         }
 
         lifecycleScope.launch {
@@ -58,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                             query?.let {
 //                                print("Submitted $it")
 //                                Log.d("Tag", "Submitted $it")
-                                searchUserGithub(it.toString())
+                                mainViewModel.searchUserGithub(it.toString())
                             }
                             return true
                         }
@@ -77,30 +91,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun searchUserGithub(userName: String) {
-        showLoading(true)
-        val client =
-            ApiConfig.getApiService().searchUsername("Bearer ${BuildConfig.API_KEY}", userName)
-        client.enqueue(object : Callback<SearchUserResponseModel> {
-            override fun onResponse(
-                call: Call<SearchUserResponseModel>,
-                response: Response<SearchUserResponseModel>
-            ) {
-                showLoading(false)
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    setRecycleViewData(responseBody.items)
-                } else {
-                    Log.e(TAG, "onFailure ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<SearchUserResponseModel>, t: Throwable) {
-                showLoading(false)
-                Log.e(TAG, "onFailure ${t.message}")
-            }
-        })
-    }
 
     private fun setRecycleViewData(listUserModelData: List<UserModel>) {
         val listUserAdapter = ListUserAdapter()
