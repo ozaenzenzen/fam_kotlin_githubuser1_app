@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
@@ -15,6 +16,8 @@ import com.example.famgithubuser1.data.response.DetailUserResponseModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
 import com.example.famgithubuser1.databinding.ActivityDetailUserBinding
 import com.example.famgithubuser1.ui.adapter.SectionPagerAdapter
+import com.example.famgithubuser1.ui.viewmodel.DetailUserViewModel
+import com.example.famgithubuser1.ui.viewmodel.MainViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
@@ -49,13 +52,22 @@ class DetailUserActivity : AppCompatActivity() {
         setViewPager()
         setToolbar(getString(R.string.profile))
 
+        val detailUserViewModel = ViewModelProvider(
+            this,
+            ViewModelProvider.NewInstanceFactory()
+        ).get(DetailUserViewModel::class.java)
+
+        detailUserViewModel.detailUser.observe(this) {
+            setDetailUserData(it)
+        }
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
 //                    if (binding.progressBar.visibility == View.VISIBLE) detailUserGithub(
 //                        usernameProfile ?: ""
 //                    )
-                    detailUserGithub(
+                    detailUserViewModel.detailUserGithub(
                         usernameProfile ?: ""
                     )
                 }
@@ -79,30 +91,6 @@ class DetailUserActivity : AppCompatActivity() {
         }.attach()
     }
 
-    private fun detailUserGithub(userName: String) {
-        showLoading(true)
-        val client =
-            ApiConfig.getApiService().getUserDetail("Bearer ${BuildConfig.API_KEY}", userName)
-        client.enqueue(object : Callback<DetailUserResponseModel> {
-            override fun onResponse(
-                call: Call<DetailUserResponseModel>,
-                response: Response<DetailUserResponseModel>
-            ) {
-                showLoading(false)
-                val responseBody = response.body()
-                if (response.isSuccessful && responseBody != null) {
-                    setDetailUserData(responseBody)
-                } else {
-                    Log.e(TAG, "onFailure ${response.message()}")
-                }
-            }
-
-            override fun onFailure(call: Call<DetailUserResponseModel>, t: Throwable) {
-                showLoading(false)
-                Log.e(TAG, "onFailure ${t.message}")
-            }
-        })
-    }
 
     fun setDetailUserData(detailUserResponseModel: DetailUserResponseModel) {
         userDetail = detailUserResponseModel
