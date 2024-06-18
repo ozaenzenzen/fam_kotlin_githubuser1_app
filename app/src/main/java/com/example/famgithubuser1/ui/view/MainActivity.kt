@@ -10,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.SearchView
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Lifecycle
@@ -20,9 +21,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.famgithubuser1.BuildConfig
 import com.example.famgithubuser1.R
+import com.example.famgithubuser1.data.factory.ViewModelFactory
 import com.example.famgithubuser1.data.response.SearchUserResponseModel
 import com.example.famgithubuser1.data.response.UserModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
+import com.example.famgithubuser1.data.service.SettingPreferences
+import com.example.famgithubuser1.data.service.dataStore
 import com.example.famgithubuser1.databinding.ActivityMainBinding
 import com.example.famgithubuser1.ui.adapter.ListUserAdapter
 import com.example.famgithubuser1.ui.view.DetailUserActivity.Companion.EXTRA_DETAIL
@@ -44,13 +48,23 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Set up the toolbar
-        setSupportActionBar(binding.appBarMain.toolbar)
+        var pref = SettingPreferences.getInstance(application.dataStore)
 
         val mainViewModel = ViewModelProvider(
             this,
-            ViewModelProvider.NewInstanceFactory()
+            ViewModelFactory(pref)
         ).get(MainViewModel::class.java)
+        mainViewModel.getThemeSettings().observe(this) { isDarkModeActive: Boolean ->
+            if (isDarkModeActive) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
+
+        // Set up the toolbar
+        setSupportActionBar(binding.appBarMain.toolbar)
+
         mainViewModel.listUser.observe(this) { data ->
             setRecycleViewData(data)
         }

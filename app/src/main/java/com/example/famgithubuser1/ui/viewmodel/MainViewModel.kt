@@ -4,16 +4,18 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import com.example.famgithubuser1.BuildConfig
 import com.example.famgithubuser1.data.response.SearchUserResponseModel
 import com.example.famgithubuser1.data.response.UserModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
+import com.example.famgithubuser1.data.service.SettingPreferences
 import com.example.famgithubuser1.ui.view.MainActivity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class MainViewModel : ViewModel() {
+class MainViewModel(private val pref: SettingPreferences) : ViewModel() {
     private val _listUser = MutableLiveData<ArrayList<UserModel>>()
     val listUser: LiveData<ArrayList<UserModel>> = _listUser
 
@@ -51,5 +53,9 @@ class MainViewModel : ViewModel() {
                 Log.e(TAG, "onFailure ${t.message}")
             }
         })
+    }
+
+    fun getThemeSettings(): LiveData<Boolean> {
+        return pref.getThemeSetting().asLiveData()
     }
 }
