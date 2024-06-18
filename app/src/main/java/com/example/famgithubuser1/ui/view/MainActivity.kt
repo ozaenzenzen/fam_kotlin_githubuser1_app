@@ -5,6 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // Set up the toolbar
-        setSupportActionBar(findViewById<Toolbar>(R.id.toolbar))
+        setSupportActionBar(binding.appBarMain.toolbar)
 
         val mainViewModel = ViewModelProvider(
             this,
@@ -59,8 +61,8 @@ class MainActivity : AppCompatActivity() {
             searchView.setIconifiedByDefault(false)
         }
 
-        mainViewModel.isLoading.observe(this) {
-                value -> showLoading(value)
+        mainViewModel.isLoading.observe(this) { value ->
+            showLoading(value)
         }
 
         lifecycleScope.launch {
@@ -89,6 +91,29 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.favorite -> {
+                Intent(this@MainActivity, FavoriteActivity::class.java).also {
+                    startActivity(it)
+                }
+            }
+
+            R.id.settings -> {
+                Intent(this@MainActivity, SettingsActivity::class.java).also {
+                    startActivity(it)
+                }
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
 
