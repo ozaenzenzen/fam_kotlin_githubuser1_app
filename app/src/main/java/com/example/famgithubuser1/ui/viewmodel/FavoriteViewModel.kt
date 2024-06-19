@@ -14,39 +14,13 @@ import kotlinx.coroutines.launch
 class FavoriteViewModel(application: Application) : ViewModel() {
     private val mUserRepository: UserRepository = UserRepository(application)
 
-    //    private val _favorites = MutableStateFlow(listOf<UserLocal>())
-    //    val favorite = _favorites.asStateFlow()
     private val _favorites = MutableLiveData<UserLocal>()
     val favorite: LiveData<UserLocal> = _favorites
 
     private val _listUser = MutableLiveData<ArrayList<UserLocal>>()
     val listUser: LiveData<ArrayList<UserLocal>> = _listUser
 
-//    init {
-//        getAllUsersFavorite()
-//    }
-
-    fun insert(userLocal: UserLocal) {
-        mUserRepository.insert(userLocal)
-    }
-
-    fun update(userLocal: UserLocal) {
-        mUserRepository.update(userLocal)
-    }
-
-    fun delete(userLocal: UserLocal) {
-        mUserRepository.delete(userLocal)
-    }
-
     fun getAllUsersFavorite(): LiveData<List<UserLocal>> {
-//        viewModelScope.launch {
-//            mUserRepository.getAllUsersFavorite()
-//        }
         return mUserRepository.getAllUsersFavorite()
     }
-
-    fun isUserFavorite(id: String) {
-        mUserRepository.isUserFavorite(id)
-    }
-
 }

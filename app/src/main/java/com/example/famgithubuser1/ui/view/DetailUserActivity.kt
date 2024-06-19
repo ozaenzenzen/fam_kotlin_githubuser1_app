@@ -53,23 +53,15 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
         setViewPager()
         setToolbar(getString(R.string.profile))
 
-        var pref = SettingPreferences.getInstance(application.dataStore)
-
-        detailUserViewModel = ViewModelProvider(
-            this,
-            ViewModelFactory(pref, application)
-        ).get(DetailUserViewModel::class.java)
+        detailUserViewModel = obtainViewModel(this@DetailUserActivity)
 
         detailUserViewModel.detailUser.observe(this) {
             setDetailUserData(it)
-            detailUserViewModel.isUserFavorite(it.login ?: "").observe(this) { value: Boolean ->
-                isFavoriteUser(value)
-            }
         }
 
-//        detailUserViewModel.isUserFavorite(usernameProfile ?: "").observe(this) { value: Boolean ->
-//            isFavoriteUser(value)
-//        }
+        detailUserViewModel.isUserFav.observe(this) { value: Boolean ->
+            isUserFavorite(value)
+        }
 
         detailUserViewModel.isLoading.observe(this) { value ->
             showLoading(value)
@@ -82,18 +74,23 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
                         usernameProfile ?: ""
                     )
                 }
-//                launch {
-//                    detailUserViewModel.isUserFavorite2(usernameProfile ?: "").collect { value ->
-//                        isFavoriteUser(value)
-//                    }
-//                }
+                launch {
+                    detailUserViewModel.isUserFavorite3(usernameProfile ?: "")
+                }
             }
         }
 
         binding.fabFavorite.setOnClickListener(this)
     }
 
-    private fun isFavoriteUser(favorite: Boolean) {
+
+    private fun obtainViewModel(activity: AppCompatActivity): DetailUserViewModel {
+        var pref = SettingPreferences.getInstance(application.dataStore)
+        val factory = ViewModelFactory.getInstance(pref, activity.application)
+        return ViewModelProvider(activity, factory).get(DetailUserViewModel::class.java)
+    }
+
+    private fun isUserFavorite(favorite: Boolean) {
         if (favorite) {
             isUserFavorite = true
             binding.fabFavorite.setImageResource(R.drawable.ic_favorite_filled)
@@ -120,7 +117,7 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
     }
 
 
-    fun setDetailUserData(detailUserResponseModel: DetailUserResponseModel) {
+    private fun setDetailUserData(detailUserResponseModel: DetailUserResponseModel) {
         userDetail = detailUserResponseModel
         binding.apply {
             tvName.text = if (userDetail?.name == null) "" else userDetail?.name.toString()
@@ -139,10 +136,8 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
     private fun showLoading(isLoading: Boolean) {
         if (isLoading) {
             binding.progressBar.visibility = View.VISIBLE
-//            binding.home.recyclerView.visibility = View.GONE
         } else {
             binding.progressBar.visibility = View.GONE
-//            binding.home.recyclerView.visibility = View.VISIBLE
         }
     }
 
@@ -167,27 +162,31 @@ class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.fab_favorite -> {
-                if (isUserFavorite) {
-                    detailUserViewModel.deleteFromFavorite(
-                        UserLocal(
-                            userDetail?.id.toString(),
-                            userDetail?.avatarUrl.toString(),
-                            userDetail?.login.toString(),
-                            false
+                if (isUserFavorite == true) {
+                    userDetail.let {
+                        detailUserViewModel.deleteFromFavorite(
+                            UserLocal(
+                                it?.login.toString(),
+                                it?.avatarUrl.toString(),
+                                it?.login.toString(),
+                                false
+                            )
                         )
-                    )
-                    isFavoriteUser(false)
+                    }
+                    isUserFavorite(false)
                     Toast.makeText(this, "User deleted from favorite", Toast.LENGTH_SHORT).show()
                 } else {
-                    detailUserViewModel.saveAsFavorite(
-                        UserLocal(
-                            userDetail?.id.toString(),
-                            userDetail?.avatarUrl.toString(),
-                            userDetail?.login.toString(),
-                            true
+                    userDetail.let {
+                        detailUserViewModel.saveAsFavorite(
+                            UserLocal(
+                                it?.login.toString(),
+                                it?.avatarUrl.toString(),
+                                it?.login.toString(),
+                                true
+                            )
                         )
-                    )
-                    isFavoriteUser(true)
+                    }
+                    isUserFavorite(true)
                     Toast.makeText(this, "User added to favorite", Toast.LENGTH_SHORT).show()
                 }
             }

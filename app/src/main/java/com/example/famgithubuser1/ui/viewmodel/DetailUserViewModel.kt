@@ -28,8 +28,8 @@ class DetailUserViewModel(application: Application) : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-//    private val _isUserFav = MutableLiveData<Boolean>()
-//    val isUserFav: LiveData<Boolean> = _isUserFav
+    private val _isUserFav = MutableLiveData<Boolean>()
+    val isUserFav: LiveData<Boolean> = _isUserFav
 
     private val mUserRepository: UserRepository = UserRepository(application)
 
@@ -82,5 +82,17 @@ class DetailUserViewModel(application: Application) : ViewModel() {
     fun isUserFavorite2(id: String): Flow<Boolean> {
         var ans = mUserRepository.isUserFavorite(id).asFlow()
         return ans
+    }
+
+    fun isUserFavorite3(id: String) {
+        viewModelScope.launch {
+            mUserRepository.isUserFavorite(id).asFlow().collect {
+                if (it) {
+                    _isUserFav.value = it
+                } else {
+                    _isUserFav.value = it
+                }
+            }
+        }
     }
 }
