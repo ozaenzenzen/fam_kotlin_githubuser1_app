@@ -30,7 +30,10 @@ class SettingsActivity : AppCompatActivity() {
         setToolbar("Settings")
 
         val settingsViewModel =
-            ViewModelProvider(this, ViewModelFactory(pref)).get(SettingViewModel::class.java)
+            ViewModelProvider(
+                this,
+                ViewModelFactory(pref, application)
+            ).get(SettingViewModel::class.java)
 
         settingsViewModel.getThemeSettings().observe(this) { isDarkModeActive: Boolean ->
             if (isDarkModeActive) {

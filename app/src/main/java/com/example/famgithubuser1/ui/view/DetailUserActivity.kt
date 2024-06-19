@@ -12,8 +12,11 @@ import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
 import com.example.famgithubuser1.BuildConfig
 import com.example.famgithubuser1.R
+import com.example.famgithubuser1.data.factory.ViewModelFactory
 import com.example.famgithubuser1.data.response.DetailUserResponseModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
+import com.example.famgithubuser1.data.service.SettingPreferences
+import com.example.famgithubuser1.data.service.dataStore
 import com.example.famgithubuser1.databinding.ActivityDetailUserBinding
 import com.example.famgithubuser1.ui.adapter.SectionPagerAdapter
 import com.example.famgithubuser1.ui.viewmodel.DetailUserViewModel
@@ -52,9 +55,12 @@ class DetailUserActivity : AppCompatActivity() {
         setViewPager()
         setToolbar(getString(R.string.profile))
 
+        var pref = SettingPreferences.getInstance(application.dataStore)
+
         val detailUserViewModel = ViewModelProvider(
             this,
-            ViewModelProvider.NewInstanceFactory()
+            // ViewModelProvider.NewInstanceFactory()
+            ViewModelFactory(pref, application)
         ).get(DetailUserViewModel::class.java)
 
         detailUserViewModel.detailUser.observe(this) {

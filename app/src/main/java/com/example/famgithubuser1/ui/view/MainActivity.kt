@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity() {
 
         val mainViewModel = ViewModelProvider(
             this,
-            ViewModelFactory(pref)
+            ViewModelFactory(pref, application)
         ).get(MainViewModel::class.java)
         mainViewModel.getThemeSettings().observe(this) { isDarkModeActive: Boolean ->
             if (isDarkModeActive) {
