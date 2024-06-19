@@ -2,33 +2,29 @@ package com.example.famgithubuser1.ui.view
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.viewpager2.widget.ViewPager2
 import com.bumptech.glide.Glide
-import com.example.famgithubuser1.BuildConfig
 import com.example.famgithubuser1.R
 import com.example.famgithubuser1.data.factory.ViewModelFactory
 import com.example.famgithubuser1.data.response.DetailUserResponseModel
-import com.example.famgithubuser1.data.retrofit.ApiConfig
+import com.example.famgithubuser1.data.room.UserLocal
 import com.example.famgithubuser1.data.service.SettingPreferences
 import com.example.famgithubuser1.data.service.dataStore
 import com.example.famgithubuser1.databinding.ActivityDetailUserBinding
 import com.example.famgithubuser1.ui.adapter.SectionPagerAdapter
 import com.example.famgithubuser1.ui.viewmodel.DetailUserViewModel
-import com.example.famgithubuser1.ui.viewmodel.MainViewModel
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-class DetailUserActivity : AppCompatActivity() {
+class DetailUserActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         private const val TAG = "DetailUserActivity"
         const val EXTRA_DETAIL = "extra_detail"
@@ -43,7 +39,9 @@ class DetailUserActivity : AppCompatActivity() {
     private var usernameProfile: String? = null
     private var profileUrl: String? = null
     private var userDetail: DetailUserResponseModel? = null
-//    private var isFavorite: Boolean? = null
+    private var isUserFavorite: Boolean = false
+
+    private lateinit var detailUserViewModel: DetailUserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,31 +55,51 @@ class DetailUserActivity : AppCompatActivity() {
 
         var pref = SettingPreferences.getInstance(application.dataStore)
 
-        val detailUserViewModel = ViewModelProvider(
+        detailUserViewModel = ViewModelProvider(
             this,
-            // ViewModelProvider.NewInstanceFactory()
             ViewModelFactory(pref, application)
         ).get(DetailUserViewModel::class.java)
 
         detailUserViewModel.detailUser.observe(this) {
             setDetailUserData(it)
+            detailUserViewModel.isUserFavorite(it.login ?: "").observe(this) { value: Boolean ->
+                isFavoriteUser(value)
+            }
         }
 
-        detailUserViewModel.isLoading.observe(this) {
-                value -> showLoading(value)
+//        detailUserViewModel.isUserFavorite(usernameProfile ?: "").observe(this) { value: Boolean ->
+//            isFavoriteUser(value)
+//        }
+
+        detailUserViewModel.isLoading.observe(this) { value ->
+            showLoading(value)
         }
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
-//                    if (binding.progressBar.visibility == View.VISIBLE) detailUserGithub(
-//                        usernameProfile ?: ""
-//                    )
                     detailUserViewModel.detailUserGithub(
                         usernameProfile ?: ""
                     )
                 }
+//                launch {
+//                    detailUserViewModel.isUserFavorite2(usernameProfile ?: "").collect { value ->
+//                        isFavoriteUser(value)
+//                    }
+//                }
             }
+        }
+
+        binding.fabFavorite.setOnClickListener(this)
+    }
+
+    private fun isFavoriteUser(favorite: Boolean) {
+        if (favorite) {
+            isUserFavorite = true
+            binding.fabFavorite.setImageResource(R.drawable.ic_favorite_filled)
+        } else {
+            isUserFavorite = false
+            binding.fabFavorite.setImageResource(R.drawable.ic_favorite)
         }
     }
 
@@ -144,5 +162,35 @@ class DetailUserActivity : AppCompatActivity() {
         profileUrl = null
 //        isFavorite = null
         super.onDestroy()
+    }
+
+    override fun onClick(v: View?) {
+        when (v?.id) {
+            R.id.fab_favorite -> {
+                if (isUserFavorite) {
+                    detailUserViewModel.deleteFromFavorite(
+                        UserLocal(
+                            userDetail?.id.toString(),
+                            userDetail?.avatarUrl.toString(),
+                            userDetail?.login.toString(),
+                            false
+                        )
+                    )
+                    isFavoriteUser(false)
+                    Toast.makeText(this, "User deleted from favorite", Toast.LENGTH_SHORT).show()
+                } else {
+                    detailUserViewModel.saveAsFavorite(
+                        UserLocal(
+                            userDetail?.id.toString(),
+                            userDetail?.avatarUrl.toString(),
+                            userDetail?.login.toString(),
+                            true
+                        )
+                    )
+                    isFavoriteUser(true)
+                    Toast.makeText(this, "User added to favorite", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }

@@ -16,6 +16,9 @@ data class UserLocal(
     @ColumnInfo(name = "avatar_url")
     var avatarUrl: String,
 
+    @ColumnInfo(name = "login")
+    var login: String,
+
     @ColumnInfo(name = "is_favorite")
     var isFavorite: Boolean,
 ) : Parcelable

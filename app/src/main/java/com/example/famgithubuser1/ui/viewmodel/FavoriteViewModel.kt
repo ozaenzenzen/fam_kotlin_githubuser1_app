@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.example.famgithubuser1.data.repository.UserRepository
+import com.example.famgithubuser1.data.response.UserModel
 import com.example.famgithubuser1.data.room.UserLocal
 import kotlinx.coroutines.launch
 
@@ -18,9 +19,12 @@ class FavoriteViewModel(application: Application) : ViewModel() {
     private val _favorites = MutableLiveData<UserLocal>()
     val favorite: LiveData<UserLocal> = _favorites
 
-    init {
-        getAllUsers()
-    }
+    private val _listUser = MutableLiveData<ArrayList<UserLocal>>()
+    val listUser: LiveData<ArrayList<UserLocal>> = _listUser
+
+//    init {
+//        getAllUsersFavorite()
+//    }
 
     fun insert(userLocal: UserLocal) {
         mUserRepository.insert(userLocal)
@@ -34,14 +38,15 @@ class FavoriteViewModel(application: Application) : ViewModel() {
         mUserRepository.delete(userLocal)
     }
 
-    private fun getAllUsers() {
-        viewModelScope.launch {
-            mUserRepository.getAllUsers()
-        }
+    fun getAllUsersFavorite(): LiveData<List<UserLocal>> {
+//        viewModelScope.launch {
+//            mUserRepository.getAllUsersFavorite()
+//        }
+        return mUserRepository.getAllUsersFavorite()
     }
 
-    fun getUserFavorite(id: String) {
-        mUserRepository.getUserFavorite(id)
+    fun isUserFavorite(id: String) {
+        mUserRepository.isUserFavorite(id)
     }
 
 }

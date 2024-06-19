@@ -21,8 +21,8 @@ interface UserDao {
     fun delete(userLocal: UserLocal)
 
     @Query("SELECT * FROM user ORDER BY id ASC")
-    fun getAllUsers(): LiveData<List<UserLocal>>
+    fun getAllUsersFavorite(): LiveData<List<UserLocal>>
 
     @Query("SELECT EXISTS(SELECT * FROM user WHERE id = :id AND is_favorite = 1)")
-    fun getUserFavorite(id: String): LiveData<Boolean>
+    fun isUserFavorite(id: String): LiveData<Boolean>
 }

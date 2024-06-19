@@ -5,11 +5,17 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import com.example.famgithubuser1.BuildConfig
 import com.example.famgithubuser1.data.repository.UserRepository
 import com.example.famgithubuser1.data.response.DetailUserResponseModel
 import com.example.famgithubuser1.data.retrofit.ApiConfig
+import com.example.famgithubuser1.data.room.UserLocal
 import com.example.famgithubuser1.ui.view.DetailUserActivity
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -21,6 +27,9 @@ class DetailUserViewModel(application: Application) : ViewModel() {
 
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
+
+//    private val _isUserFav = MutableLiveData<Boolean>()
+//    val isUserFav: LiveData<Boolean> = _isUserFav
 
     private val mUserRepository: UserRepository = UserRepository(application)
 
@@ -54,7 +63,24 @@ class DetailUserViewModel(application: Application) : ViewModel() {
         })
     }
 
-    fun getUserFavorite(id: String) {
-        mUserRepository.getUserFavorite(id)
+    fun saveAsFavorite(user: UserLocal) {
+        viewModelScope.launch {
+            mUserRepository.insert(user)
+        }
+    }
+
+    fun deleteFromFavorite(user: UserLocal) {
+        viewModelScope.launch {
+            mUserRepository.delete(user)
+        }
+    }
+
+    fun isUserFavorite(id: String): LiveData<Boolean> {
+        return mUserRepository.isUserFavorite(id)
+    }
+
+    fun isUserFavorite2(id: String): Flow<Boolean> {
+        var ans = mUserRepository.isUserFavorite(id).asFlow()
+        return ans
     }
 }

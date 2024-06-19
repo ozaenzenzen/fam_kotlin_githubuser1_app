@@ -17,9 +17,9 @@ class UserRepository(application: Application) {
         mUsersDao = db.userDao()
     }
 
-    fun getAllUsers(): LiveData<List<UserLocal>> = mUsersDao.getAllUsers()
+    fun getAllUsersFavorite(): LiveData<List<UserLocal>> = mUsersDao.getAllUsersFavorite()
 
-    fun getUserFavorite(id: String): LiveData<Boolean> = mUsersDao.getUserFavorite(id)
+    fun isUserFavorite(id: String): LiveData<Boolean> = mUsersDao.isUserFavorite(id)
 
     fun insert(userLocal: UserLocal) {
         executorService.execute { mUsersDao.insert(userLocal) }

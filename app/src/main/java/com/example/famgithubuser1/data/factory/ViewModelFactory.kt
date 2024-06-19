@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.famgithubuser1.data.service.SettingPreferences
 import com.example.famgithubuser1.ui.viewmodel.DetailUserViewModel
+import com.example.famgithubuser1.ui.viewmodel.FavoriteViewModel
 import com.example.famgithubuser1.ui.viewmodel.MainViewModel
 import com.example.famgithubuser1.ui.viewmodel.SettingViewModel
 
@@ -37,6 +38,8 @@ class ViewModelFactory(
             return SettingViewModel(pref) as T
         } else if (modelClass.isAssignableFrom(DetailUserViewModel::class.java)) {
             return DetailUserViewModel(mApplication) as T
+        } else if (modelClass.isAssignableFrom(FavoriteViewModel::class.java)) {
+            return FavoriteViewModel(mApplication) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
     }
